@@ -9,10 +9,12 @@
  */
 namespace kiaf\config;
 
+use kiaf\autoload\Autoload;
+
 class Config
 {
     private static $config = array(
-        // 'namespace_map' => [],
+        'namespace_map' => [],
         'default_module' => 'home',
         'default_controller' => 'index',
         'default_action' => 'index',
@@ -22,6 +24,11 @@ class Config
     {
         $config = include APP_CONFIG_PATH . 'config.php';
         self::$config = array_merge(self::$config, $config);
+        if (!empty(self::$config['namespace_map'])) {
+            foreach (self::$config['namespace_map'] as $key => $value) {
+                Autoload::setNamespaceMap($key, $value);
+            }
+        }
         // TODO
         // 解析XML、JSON
     }

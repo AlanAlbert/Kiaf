@@ -9,22 +9,17 @@
  */
 namespace kiaf\autoload;
 
+use kiaf\config\Config;
+
 class Autoload
 {
     private static $namespace_map = array(
         '\\app' => APP_PATH,
-        '\\kiaf' => FRAMEWORK_PATH,
-        '\\kiaf\\autoload' => AUTOLOAD_PATH,
-        '\\kiaf\\config' => CONFIG_PATH,
-        '\\kiaf\\database' => DATABASE_PATH,
-        '\\kiaf\\error' => ERROR_PATH,
-        '\\kiaf\\exception' => EXCEPTION_PATH,
-        '\\kiaf\\router' => ROUTER_PATH,
+        '\\kiaf' => LIBRARY_PATH,
     );
 
     private static function autoload($class_name)
     {
-        \var_dump($class_name);
         $class_info = self::parseClassName($class_name);
         $dir = '';
         $namespace = '';
@@ -41,7 +36,7 @@ class Autoload
         }
     }
 
-    private static function parseClassName(string $class_name) :? array
+    private static function parseClassName(string $class_name)
     {
         $body = explode('\\', $class_name);
         $result['class'] = array_pop($body);
@@ -57,10 +52,14 @@ class Autoload
 
     public static function setNamespaceMap(string $namespace, string $dir)
     {
-        self::$namespace_map[$namespce] = $dir;
+        if (isset(self::$namespace_map[$namespace])) {
+            return false;
+        }
+        self::$namespace_map[$namespace] = $dir;
+        return true;
     }
 
-    public static function getNamespaceMap(string $namespace) :? string
+    public static function getNamespaceMap(string $namespace)
     {
         return self::$namespace_map[$namespace] ?? null;
     }

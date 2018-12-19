@@ -15,9 +15,6 @@ use kiaf\router\Router;
 class Kiaf
 {
     private static $app_path;
-    // private static $platform = 'Home';
-    // private static $controller;
-    // private static $action;
 
     public static function run(string $app_path = './Application', bool $use_composer_autoload = false)
     {
