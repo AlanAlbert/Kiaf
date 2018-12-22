@@ -17,6 +17,10 @@ class Db
 
     public function __construct()
     {
+        if (empty(self::$config)) {
+            throw new \Exception("Does not have database configuration items", E_USER_ERROR);
+            
+        }
         $dns = self::$config['db_type'] . ':' .
             'host=' . self::$config['db_host'] . ';' .
             'port=' . self::$config['db_port'] . ';' .

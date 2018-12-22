@@ -32,9 +32,12 @@ class Exception
         // TODO
         // 使用错误模板
         if (DEBUG_MODE) {
-            var_dump($e);
+            echo '<h2>', $e->getMessage(), '</h2>';
+            echo '<h3>File: <span style="color:red;">', $e->getFile(), '</span></h3>';
+            echo '<h3>Line: <span style="color:red;">', $e->getLine(), '</span></h3>';
+            echo '<h3>Trance: <span style="color:red;">', $e->getTraceAsString(), '</span></h3>';
         } else {
-            echo '页面发生错误，请稍后再试';
+            echo '<h1>页面发生错误，请稍后再试~</h1>';
         }
     }
 }

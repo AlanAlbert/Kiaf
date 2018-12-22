@@ -38,13 +38,13 @@ class Config
 
         # 数据库配置
         'database' => array(
-            'db_type' => 'mysql',
-            'db_host' => '127.0.0.1',
-            'db_port' => '3306',
-            'db_user' => 'root',
-            'db_pwd' => '',
-            'db_name' => '',
-            'db_char_set' => 'utf8',
+            // 'db_type' => '',
+            // 'db_host' => '',
+            // 'db_port' => '',
+            // 'db_user' => '',
+            // 'db_pwd' => '',
+            // 'db_name' => '',
+            // 'db_char_set' => '',
         ),
     );
 

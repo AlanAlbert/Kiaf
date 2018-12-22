@@ -152,7 +152,8 @@ class Kiaf
         $index_content =
             '<?php' . PHP_EOL .
             'namespace app\home\controller;' . PHP_EOL . PHP_EOL .
-            'class Index' . PHP_EOL .
+            'use kiaf\controller\Controller;' . PHP_EOL . PHP_EOL .
+            'class Index extends Controller' . PHP_EOL .
             '{' . PHP_EOL .
             '    public function index()' . PHP_EOL .
             '    {' . PHP_EOL .

@@ -25,28 +25,26 @@ class Controller
      */
     protected function jump($url, $timeout = 2, $msg = '跳转中，请稍后...')
     {
-        if (!file_exists(APP_TPL_PATH . Config::getValue('jump_tpl'))) {
+        $tpl_file = APP_TPL_PATH . Config::getValue('jump_tpl');
+        if (!file_exists($tpl_file)) {
             throw new \Error('Template file ' . $view_path . ' does not exist!', E_USER_ERROR);
         }
-        $tpl = file_get_contents(APP_TPL_PATH . Config::getValue('jump_tpl'));
+        $tpl = file_get_contents($tpl_file);
         $this->assign('url', $url);
         $this->assign('timeout', $timeout);
         $this->assign('msg', $msg);
-        if (headers_sent()) {
-            $meta = "<meta http-equiv='Refresh' content='{$timeout};
-                URL=[{url}]'>";
-            $tpl = $meta . $tpl;
-            $this->render($tpl);
+        if ($timeout === 0) {
+            header("Location:{$url}");
             exit();
         } else {
-            if ($timeout === 0) {
-                header("Location:{$url}");
-            } else {
-                header("refresh:{$timeout};url={$url}");
-                $this->render($tpl);
-            }
-            exit();
+            $meta = "<meta http-equiv='Refresh' content='[{timeout}];
+                URL=[{url}]'>";
+            $tpl = $meta . $tpl;
+            $tpl = $this->convertView($tpl);
+            $cache_file = $this->generateCacheFile($tpl_file, $tpl);
+            include $cache_file;
         }
+
     }
 
     /**
@@ -64,25 +62,21 @@ class Controller
     /**
      * 渲染视图
      * @method render
-     * @param string content 渲染的内容
      * @return void
      */
-    protected function render($view_content = null)
+    protected function render()
     {
-        if (!$view_content) {
-            $view_path = APP_PATH . CURRENT_MODULE . DS .
-                'view' . DS .
-                CURRENT_CONTROLLER . DS .
-                CURRENT_ACTION . '.html';
-            if (!file_exists($view_path)) {
-                throw new \Error('View file ' . $view_path . ' does not exist!', E_USER_ERROR);
-            }
-            $view_content = file_get_contents($view_path);
+        $view_path = APP_PATH . CURRENT_MODULE . DS .
+            'view' . DS .
+            CURRENT_CONTROLLER . DS .
+            CURRENT_ACTION . '.php';
+        if (!file_exists($view_path)) {
+            throw new \Error('View file ' . $view_path . ' does not exist!', E_USER_ERROR);
         }
+        $view_content = file_get_contents($view_path);
         $view_content = $this->convertView($view_content);
-        // TODO
-        // 调用generateHtmlCache()生成静态缓存文件
-        echo $view_content;
+        $cache_path = $this->generateCacheFile($view_path, $view_content);
+        include $cache_path;
     }
 
     /**
@@ -95,10 +89,9 @@ class Controller
     {
         $left_delimiter = Config::getValue('left_delimiter');
         $right_delimiter = Config::getValue('right_delimiter');
-        foreach ($this->assign_values as $key => $value) {
-            $content = str_replace($left_delimiter . $key . $right_delimiter,
-                $value, $content);
-        }
+        $content = str_replace($left_delimiter,
+            '<?php echo $this->assign_values["', $content);
+        $content = str_replace($right_delimiter, '"]; ?>', $content);
         return $content;
     }
 
@@ -107,10 +100,15 @@ class Controller
      * @method generateHtmlCache
      * @return boolean            生成的结果
      */
-    private function generateHtmlCache()
+    private function generateCacheFile($file, $content)
     {
-        // TODO
-        // 生成静态HTML缓存文件
+        $modify_time = filemtime($file);
+        $cache_file_name = md5($file . '_' . $modify_time) . '.php';
+        $cache_path = APP_CACHE_PATH . $cache_file_name;
+        if (!file_exists($cache_path)) {
+            file_put_contents($cache_path, $content);
+        }
+        return $cache_path;
     }
 
     /**

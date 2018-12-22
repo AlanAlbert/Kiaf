@@ -38,12 +38,11 @@ class Error
         // 使用错误模板
 
         if (DEBUG_MODE) {
-            var_dump($err_type);
-            var_dump($err_msg);
-            var_dump($err_file);
-            var_dump($err_line);
+            echo '<h2>', $err_msg, '</h2>';
+            echo '<h3>File: <span style="color:red;">', $err_file, '</span></h3>';
+            echo '<h3>Line: <span style="color:red;">', $err_line, '</span></h3>';
         } else {
-            echo '页面发生错误，请稍后再试';
+            echo '<h2>页面发生错误，请稍后再试~</h2>';
         }
     }
 
@@ -57,10 +56,13 @@ class Error
         if ($error = error_get_last()) {
             // TODO
             // 使用错误模板
+            
             if (DEBUG_MODE) {
-                var_dump($error);
+                echo '<h2>', $error['message'], '</h2>';
+                echo '<h3>File: <span style="color:red;">', $error['file'], '</span></h3>';
+                echo '<h3>Line: <span style="color:red;">', $error['line'], '</span></h3>';
             } else {
-                echo '页面发生错误，请稍后再试';
+                echo '<h1>页面发生错误，请稍后再试</h1>';
             }
         }
     }
