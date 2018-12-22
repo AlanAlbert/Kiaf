@@ -10,35 +10,70 @@
 namespace kiaf\config;
 
 use kiaf\autoload\Autoload;
+use kiaf\database\Db;
 
 class Config
 {
     private static $config = array(
-        'namespace_map' => [],
+        # 命名空间-路径 映射关系
+        'namespace_map' => [
+
+        ],
+
+        # 应用下根命名空间
+        'app_root_namespace' => 'app\\',
+
+        # 默认模块、控制器、方法
         'default_module' => 'home',
         'default_controller' => 'index',
         'default_action' => 'index',
+
+        # 视图左右定界符
         'left_delimiter' => '[{',
         'right_delimiter' => '}]',
-        'default_jump_tpl' => 'default_jump.tpl',
+
+        # 跳转模板
+        'jump_tpl' => 'default_jump.tpl',
+
+        # 数据库配置
+        'database' => array(
+            'db_type' => 'mysql',
+            'db_host' => '127.0.0.1',
+            'db_port' => '3306',
+            'db_user' => 'root',
+            'db_pwd' => '',
+            'db_name' => '',
+            'db_char_set' => 'utf8mb4',
+        ),
     );
 
     /**
-     * 解析配置文件
+     * 解析配置文件，并将相关配置传到
      * @method parseConfig
      * @return void
      */
-    public static function parseConfig()
+    public static function loadConfig()
     {
         $config = include APP_CONFIG_PATH . 'config.php';
         self::$config = array_merge(self::$config, $config);
-        if (USE_COMPOSER_AUTOLOAD && !empty(self::$config['namespace_map'])) {
-            foreach (self::$config['namespace_map'] as $key => $value) {
-                Autoload::setNamespaceMap($key, $value);
+
+        # 命名空间加载到Autoload
+        if (!USE_COMPOSER_AUTOLOAD) {
+            if (!empty(self::$config['namespace_map'])) {
+                foreach (self::$config['namespace_map'] as $key => $value) {
+                    Autoload::setNamespaceMap($key, $value);
+                }
+            }
+            if (!empty(self::$config['app_root_namespace'])) {
+                Autoload::setNamespaceMap(self::$config['app_root_namespace'],
+                    APP_PATH);
             }
         }
-        // TODO
-        // 解析XML、JSON
+
+        # 数据库配置加载到Db
+        if (!empty(self::$config['database'])) {
+            Db::setConfig(self::$config['database']);
+        }
     }
 
     /**

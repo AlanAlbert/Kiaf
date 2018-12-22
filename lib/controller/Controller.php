@@ -25,18 +25,22 @@ class Controller
      */
     protected function jump($url, $timeout = 2, $msg = '跳转中，请稍后...')
     {
-        // HTML内容
+        $tpl = file_get_contents(APP_TPL_PATH . Config::getValue('jump_tpl'));
+        $this->assign('url', $url);
+        $this->assign('timeout', $timeout);
+        $this->assign('msg', $msg);
         if (headers_sent()) {
-            $tpl = include APP_TPL_PATH . Config::getValue('default_jump_tpl');
-            $str = "<meta http-equiv='Refresh' content='{$timeout};
-                URL={$url}'>";
-            $str .= $tpl;
+            $meta = "<meta http-equiv='Refresh' content='{$timeout};
+                URL=[{url}]'>";
+            $tpl = $meta . $tpl;
+            $this->render($tpl);
             exit();
         } else {
             if ($timeout === 0) {
                 header("Location:{$url}");
             } else {
                 header("refresh:{$timeout};url={$url}");
+                $this->render($tpl);
             }
             exit();
         }
@@ -57,14 +61,17 @@ class Controller
     /**
      * 渲染视图
      * @method render
+     * @param string content 渲染的内容
      * @return void
      */
-    protected function render()
+    protected function render($view_content = null)
     {
-        $view_content = file_get_contents(APP_PATH . CURRENT_MODULE . DS .
-            'view' . DS .
-            CURRENT_CONTROLLER . DS .
-            CURRENT_ACTION . '.php');
+        if (!$view_content) {
+            $view_content = file_get_contents(APP_PATH . CURRENT_MODULE . DS .
+                'view' . DS .
+                CURRENT_CONTROLLER . DS .
+                CURRENT_ACTION . '.php');
+        }
         $view_content = $this->convertView($view_content);
         // TODO
         // 调用generateHtmlCache()生成静态缓存文件

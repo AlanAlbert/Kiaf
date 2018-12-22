@@ -1,5 +1,87 @@
 # Kiaf---Kiaf Is Another Framework
 
+## 要求--Requirement
+
+本项目使用到：
+
+* ?? NULL合并运算符
+* 函数参数类型声明
+* 函数返回值类型声明
+
+因此，需要**PHP>=7.0**
+
+## 使用--Usage
+
+### 框架入口
+
+```PHP
+# 1、使用composer autoload
+# 需要在composer.json中配置命名空间映射关系，如：
+# {
+#    "autoload": {
+#        "psr-4": {
+#            "app\\": "app/",
+#            "kiaf\\": ["kiaf/", "kiaf/lib/"]
+#        }
+#    }
+#}
+namespace kiaf;
+
+require('./vendor/autoload.php');
+Kiaf::run('./app', true);
+
+# 2、也可以选择使用框架自带的autoload
+namespace kiaf;
+
+require('./kiaf/Kiaf.php');
+Kiaf::run('./app');
+```
+
+其中，run()函数是框架的运行入口，其接受两个参数：
+
+```PHP
+Kiaf::run(string app_path, boolean use_composer_autoload)
+string app_path: 应用根目录
+boolean use_composer_autoload: 是否使用composer的自动加载
+```
+
+**每次修改composer.json后都需要使用```composer update```来更新**
+
+### 配置文件
+
+```json
+# 位置：app/config/config.php
+# 命名空间-路径 映射关系
+'namespace_map' => [
+
+],
+
+# 应用下根命名空间
+'app_root_namespace' => 'app\\',
+
+# 默认模块、控制器、方法
+'default_module' => 'home',
+'default_controller' => 'index',
+'default_action' => 'index',
+
+# 视图左右定界符
+'left_delimiter' => '[{',
+'right_delimiter' => '}]',
+
+# 跳转模板
+'jump_tpl' => 'default_jump.tpl',
+
+# 数据库配置
+'db_type' => 'mysql',
+'db_host' => '127.0.0.1',
+'db_port' => '3306',
+'db_user' => 'root',
+'db_pwd' => '',
+'db_selected_db' => '',
+'db_char_set' => 'utf8mb4',
+```
+
+
 ## 编码规范
 
 本项目编码风格遵循PSR-2，自动加载遵循PSR-4

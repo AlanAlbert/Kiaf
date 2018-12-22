@@ -1,10 +1,10 @@
 <?php
 /**
- * Autoload.php 自动加载类 
- * @author: Alan_Albert <alanalbert@qq.com> 
+ * Autoload.php 自动加载类
+ * @author: Alan_Albert <alanalbert@qq.com>
  * @version: 0.0.1
  * @copyright: Kiaf
- * @created time: 2018-12-19 13:22:36 
+ * @created time: 2018-12-19 13:22:36
  * @last modified by: Alan_Albert <alanalbert@qq.com>
  */
 namespace kiaf\autoload;
@@ -14,8 +14,7 @@ use kiaf\config\Config;
 class Autoload
 {
     private static $namespace_map = array(
-        '\\app' => APP_PATH,
-        '\\kiaf' => LIBRARY_PATH,
+        'kiaf\\' => LIBRARY_PATH,
     );
 
     private static function autoload($class_name)
@@ -25,7 +24,7 @@ class Autoload
         $namespace = '';
         foreach ($class_info['namespace_part'] as $value) {
             $dir .= $value . DS;
-            $namespace .= '\\' . $value;
+            $namespace .= $value . '\\';
             $dir = self::$namespace_map[$namespace] ?? $dir;
         }
         $class_path = $dir . $class_info['class'] . '.php';
@@ -47,7 +46,7 @@ class Autoload
 
     public static function registerAutoload()
 	{
-        spl_autoload_register(array('\kiaf\autoload\Autoload', 'autoload'), true, true);
+        spl_autoload_register(array(__CLASS__, 'autoload'), true, true);
     }
 
     public static function setNamespaceMap(string $namespace, string $dir)

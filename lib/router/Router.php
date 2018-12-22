@@ -14,7 +14,7 @@ use kiaf\config\Config;
 class Router
 {
     private static $router_map = array(
-        
+
     );
 
     /**
@@ -34,13 +34,15 @@ class Router
         unset($params['c']);
         unset($params['a']);
 
+        $post_data = $_POST ?? array();
+
         // 加载不同平台的控制器
-        $controller_path = '\\app\\' . CURRENT_MODULE .
+        $controller_path = '\\' . Config::getValue('app_root_namespace') . CURRENT_MODULE .
             '\\controller' .
             '\\' . ucfirst(CURRENT_CONTROLLER);
         $controller = new $controller_path();
         $action = CURRENT_ACTION;
-        $controller->$action($params);
+        $controller->$action($params, $post_data);
     }
 
     /**

@@ -11,6 +11,8 @@ namespace kiaf;
 
 use kiaf\config\Config;
 use kiaf\router\Router;
+use kiaf\error\Error;
+use kiaf\exception\Exception;
 
 class Kiaf
 {
@@ -23,8 +25,17 @@ class Kiaf
      * @param  boolean $use_composer_autoload 是否使用composer autoload
      * @return void
      */
-    public static function run($app_path = './Application', $use_composer_autoload = false)
+    public static function run($app_path = './Application',
+        $use_composer_autoload = false)
     {
+        # 注册错误、异常处理函数
+        if (!$use_composer_autoload) {
+            require __DIR__ . '/lib/error/Error.php';
+            require __DIR__ . '/lib/exception/Exception.php';
+        }
+        Error::registerErrorHandler();
+        Exception::registerExceptionHandler();
+
         # 初始化
         self::$app_path = $app_path;
         self::initFolder();
@@ -38,7 +49,7 @@ class Kiaf
         }
 
         # 载入配置文件
-        Config::parseConfig();
+        Config::loadConfig();
 
         # 路由
         Router::parseRequest();
@@ -76,8 +87,10 @@ class Kiaf
         define('APP_TPL_PATH', APP_PATH . 'tpl' . DS);
 
         # 应用根URL
-        define('ROOT_URL', (isset($_SERVER['HTTPS']) ? 'https' : 'http') .
-            '://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME']);
+        if (PHP_SAPI !== 'cli') {
+            define('ROOT_URL', (isset($_SERVER['HTTPS']) ? 'https' : 'http') .
+                '://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME']);
+        }
     }
 
     /**
@@ -142,33 +155,33 @@ class Kiaf
             DIRECTORY_SEPARATOR .
             'default_jump.tpl';
         $jump_tpl_content = <<<'HTML'
-            <!DOCTYPE html>
-            <html lang="en" dir="ltr">
-                <head>
-                    <meta charset="utf-8">
-                    <title>跳转中...</title>
-                </head>
-                <body>
-                    <h2><?php echo $msg; ?></h2>
-                    <div id="time-tips">
-                        <span id="timeout"><?php echo $timeout; ?></span>
-                        秒后跳转至<a href="<?php echo $url; ?>">此处</a>...
-                    </div>
-                </body>
-                <script type="text/javascript">
-                    var timeout_tips = document.getElementById('timeout');
-                    var timeout = parseInt(timeout_tips.innerHTML) * 1000;
-                    var url = "<?php echo $url; ?>";
-                    if (timeout >= 1000) {
-                        setInterval(function () {
-                            if (timeout > 0) {
-                                timeout = timeout-1000 > 0 ? timeout-1000 : 0;
-                                timeout_tips.innerHTML = timeout/1000;
-                            }
-                        }, 1000);
-                    }
-                </script>
-            </html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>跳转中...</title>
+    </head>
+    <body>
+        <h2><?php echo $msg; ?></h2>
+        <div id="time-tips">
+            <span id="timeout"><?php echo $timeout; ?></span>
+            秒后跳转至<a href="<?php echo $url; ?>">此处</a>...
+        </div>
+    </body>
+    <script type="text/javascript">
+        var timeout_tips = document.getElementById('timeout');
+        var timeout = parseInt(timeout_tips.innerHTML) * 1000;
+        var url = "<?php echo $url; ?>";
+        if (timeout >= 1000) {
+            setInterval(function () {
+                if (timeout > 0) {
+                    timeout = timeout-1000 > 0 ? timeout-1000 : 0;
+                    timeout_tips.innerHTML = timeout/1000;
+                }
+            }, 1000);
+        }
+    </script>
+</html>
 HTML;
 
         $files = array(
@@ -176,7 +189,7 @@ HTML;
             $controller_index => $index_content,
             $default_jump_tpl => $jump_tpl_content,
         );
-        self::createFiles($dirs);
+        self::createFiles($files);
     }
 
     /**
