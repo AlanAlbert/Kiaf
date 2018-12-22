@@ -25,6 +25,19 @@ class Db
             self::$config['db_user'],
             self::$config['db_pwd']);
         $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->setCharset(self::$config['db_char_set']);
+    }
+
+    /**
+     * 设置字符集
+     * @method setCharset
+     * @param  string     $charset 字符集
+     * @return int    受影响行数
+     */
+    protected function setCharset($charset)
+    {
+        $sql = 'set names `' . $charset . '`';
+        return $this->execSql($sql);
     }
 
     /**
@@ -173,12 +186,12 @@ class Db
     }
 
     /**
-     * 直接执行SQL语句
+     * 直接执行SQL查询语句
      * @method execSql
      * @param  string  $sql SQL语句
      * @return array       结果
      */
-    public function execSql($sql, $type = \PDO::FETCH_ASSOC)
+    public function querySql($sql, $type = \PDO::FETCH_ASSOC)
     {
         $stmt = $this->conn->prepare($sql);
         if ($stmt->execute()) {
@@ -188,12 +201,23 @@ class Db
     }
 
     /**
+     * 执行SQL语句，
+     * @method execSql
+     * @param  string  $sql SQL语句
+     * @return int       受影响行数
+     */
+    public function execSql($sql)
+    {
+        return $this->conn->exec($sql);
+    }
+
+    /**
      * 生成SQL的列
      * @method generateFields
      * @param  array         $fields 列
      * @return string                 部分SQL
      */
-    private function generateFields($fields)
+    protected function generateFields($fields)
     {
         $sql = '';
         $tmp = [];

@@ -28,11 +28,10 @@ class Autoload
             $dir = self::$namespace_map[$namespace] ?? $dir;
         }
         $class_path = $dir . $class_info['class'] . '.php';
-        if (is_file($class_path)) {
-            require $class_path;
-        } else {
-            throw new \Error($class_path . ' not found');
+        if (!file_exists($class_path)) {
+            throw new \Error('File ' . $class_path . ' does not exist', E_USER_ERROR);
         }
+        require $class_path;
     }
 
     private static function parseClassName(string $class_name)

@@ -34,10 +34,17 @@ class Error
      */
     public static function errorHandler($err_type, $err_msg, $err_file, $err_line)
     {
-        var_dump($err_type);
-        var_dump($err_msg);
-        var_dump($err_file);
-        var_dump($err_line);
+        // TODO
+        // 使用错误模板
+
+        if (DEBUG_MODE) {
+            var_dump($err_type);
+            var_dump($err_msg);
+            var_dump($err_file);
+            var_dump($err_line);
+        } else {
+            echo '页面发生错误，请稍后再试';
+        }
     }
 
     /**
@@ -48,7 +55,13 @@ class Error
     public static function shutdownHandler()
     {
         if ($error = error_get_last()) {
-            var_dump($error);
+            // TODO
+            // 使用错误模板
+            if (DEBUG_MODE) {
+                var_dump($error);
+            } else {
+                echo '页面发生错误，请稍后再试';
+            }
         }
     }
 }

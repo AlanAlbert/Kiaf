@@ -23,11 +23,16 @@ class Kiaf
      * @method run
      * @param  string  $app_path              应用目录
      * @param  boolean $use_composer_autoload 是否使用composer autoload
+     * @param  boolean $debug_mode            是否开启调试模式
      * @return void
      */
     public static function run($app_path = './Application',
-        $use_composer_autoload = false)
+        $use_composer_autoload = false,
+        $debug_mode = false)
     {
+        # 调试模式
+        define('DEBUG_MODE', $debug_mode);
+
         # 注册错误、异常处理函数
         if (!$use_composer_autoload) {
             require __DIR__ . '/lib/error/Error.php';
@@ -38,11 +43,16 @@ class Kiaf
 
         # 初始化
         self::$app_path = $app_path;
-        self::initFolder();
+        // 如果不存在已初始化标志文件，则初始化目录
+        if (!file_exists($app_path . DIRECTORY_SEPARATOR .
+            'tpl' . DIRECTORY_SEPARATOR .
+            '.app_initialized')) {
+            self::initFolder();
+        }
         self::initConst();
-        define('USE_COMPOSER_AUTOLOAD', $use_composer_autoload);
 
         # 自动加载
+        define('USE_COMPOSER_AUTOLOAD', $use_composer_autoload);
         if (!$use_composer_autoload) {
             require AUTOLOAD_PATH . 'autoload.php';
             \kiaf\autoload\Autoload::registerAutoload();
@@ -184,12 +194,20 @@ class Kiaf
 </html>
 HTML;
 
+        # 已初始化标志文件
+        $initialized_flag_file = $cache_path .
+            DIRECTORY_SEPARATOR .
+            '.app_initialized';
+
         $files = array(
             $config_file => $config_content,
             $controller_index => $index_content,
             $default_jump_tpl => $jump_tpl_content,
+            $initialized_flag_file => '',
         );
         self::createFiles($files);
+
+
     }
 
     /**

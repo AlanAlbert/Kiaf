@@ -25,6 +25,9 @@ class Controller
      */
     protected function jump($url, $timeout = 2, $msg = '跳转中，请稍后...')
     {
+        if (!file_exists(APP_TPL_PATH . Config::getValue('jump_tpl'))) {
+            throw new \Error('Template file ' . $view_path . ' does not exist!', E_USER_ERROR);
+        }
         $tpl = file_get_contents(APP_TPL_PATH . Config::getValue('jump_tpl'));
         $this->assign('url', $url);
         $this->assign('timeout', $timeout);
@@ -67,10 +70,14 @@ class Controller
     protected function render($view_content = null)
     {
         if (!$view_content) {
-            $view_content = file_get_contents(APP_PATH . CURRENT_MODULE . DS .
+            $view_path = APP_PATH . CURRENT_MODULE . DS .
                 'view' . DS .
                 CURRENT_CONTROLLER . DS .
-                CURRENT_ACTION . '.php');
+                CURRENT_ACTION . '.html';
+            if (!file_exists($view_path)) {
+                throw new \Error('View file ' . $view_path . ' does not exist!', E_USER_ERROR);
+            }
+            $view_content = file_get_contents($view_path);
         }
         $view_content = $this->convertView($view_content);
         // TODO

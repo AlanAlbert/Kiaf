@@ -34,6 +34,7 @@ class Config
 
         # 跳转模板
         'jump_tpl' => 'default_jump.tpl',
+        // 'error_handler_tpl' => 'default_error_handler.tpl',
 
         # 数据库配置
         'database' => array(
@@ -43,7 +44,7 @@ class Config
             'db_user' => 'root',
             'db_pwd' => '',
             'db_name' => '',
-            'db_char_set' => 'utf8mb4',
+            'db_char_set' => 'utf8',
         ),
     );
 
@@ -54,7 +55,7 @@ class Config
      */
     public static function loadConfig()
     {
-        $config = include APP_CONFIG_PATH . 'config.php';
+        $config = include APP_CONFIG_PATH . 'config.php' ?? [];
         self::$config = array_merge(self::$config, $config);
 
         # 命名空间加载到Autoload

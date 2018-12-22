@@ -44,7 +44,7 @@ class Model
     {
         $result = [];
         $sql = 'desc ' . $this->table;
-        $fields = $this->db->execSql($sql);
+        $fields = $this->db->querySql($sql);
         foreach ($fields as $key => $value) {
             $result['fields'][] = $value['Field'];
             if ($value['Key'] === 'PRI') {

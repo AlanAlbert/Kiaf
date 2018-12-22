@@ -40,9 +40,13 @@ Kiaf::run('./app');
 其中，run()函数是框架的运行入口，其接受两个参数：
 
 ```PHP
-Kiaf::run(string app_path, boolean use_composer_autoload)
-string app_path: 应用根目录
-boolean use_composer_autoload: 是否使用composer的自动加载
+/**
+ * 框架运行
+ * @param string app_path 应用根目录
+ * @param boolean use_composer_autoload 是否使用composer autoload
+ * @return void
+ */
+Kiaf::run(string $app_path, boolean $use_composer_autoload)
 ```
 
 **每次修改composer.json后都需要使用```composer update```来更新**
@@ -51,7 +55,10 @@ boolean use_composer_autoload: 是否使用composer的自动加载
 
 ```json
 # 位置：app/config/config.php
-# 命名空间-路径 映射关系
+# 如果使用自带的autoload
+# 则可以配置额外的命名空间-路径映射关系
+# （暂不支持一个命名空间映射到多个目录）
+#
 'namespace_map' => [
 
 ],
@@ -65,8 +72,8 @@ boolean use_composer_autoload: 是否使用composer的自动加载
 'default_action' => 'index',
 
 # 视图左右定界符
-'left_delimiter' => '[{',
-'right_delimiter' => '}]',
+'left_delimiter' => "[{",
+'right_delimiter' => "}]",
 
 # 跳转模板
 'jump_tpl' => 'default_jump.tpl',
@@ -78,7 +85,7 @@ boolean use_composer_autoload: 是否使用composer的自动加载
 'db_user' => 'root',
 'db_pwd' => '',
 'db_selected_db' => '',
-'db_char_set' => 'utf8mb4',
+'db_char_set' => 'utf8',
 ```
 
 
