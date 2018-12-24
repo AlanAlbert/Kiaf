@@ -27,7 +27,7 @@ class Controller
     {
         $tpl_file = APP_TPL_PATH . Config::getValue('jump_tpl');
         if (!file_exists($tpl_file)) {
-            throw new \Error('Template file ' . $view_path . ' does not exist!', E_USER_ERROR);
+            throw new \Error('Template file does not exist!' . $tpl_file, E_USER_ERROR);
         }
         $tpl = file_get_contents($tpl_file);
         $this->assign('url', $url);
@@ -71,10 +71,9 @@ class Controller
             CURRENT_CONTROLLER . DS .
             CURRENT_ACTION . '.php';
         if (!file_exists($view_path)) {
-            throw new \Error('View file ' . $view_path . ' does not exist!', E_USER_ERROR);
+            throw new \Error('View file does not exist!' . $view_path, E_USER_ERROR);
         }
         $view_content = file_get_contents($view_path);
-        $view_content = $this->convertView($view_content);
         $cache_path = $this->generateCacheFile($view_path, $view_content);
         include $cache_path;
     }
@@ -87,8 +86,77 @@ class Controller
      */
     private function convertView($content)
     {
+        require_once LIBRARY_PATH . 'phpquery/phpQuery.php';
+        libxml_use_internal_errors(true);
         $left_delimiter = Config::getValue('left_delimiter');
         $right_delimiter = Config::getValue('right_delimiter');
+
+        while (true){
+            $doc = \phpQuery::newDocumentHTML($content);
+            $fors = $doc['for'];
+            $ifs = $doc['if'];
+            $elseifs = $doc['elseif'];
+            $elses = $doc['else'];
+            if (!count($fors) &&
+                !count($ifs) &&
+                !count($elseifs) &&
+                !count($elses)) break;
+            // 转换if标签
+            foreach ($ifs as $if) {
+                $if = pq($if);
+                if (!$condition = $if->attr('condition')) {
+                    throw new \Error('View dose not have attribute "condition"',
+                        E_USER_ERROR);
+                }
+                $condition = $this->convertEquJudge($condition);
+                $inner_html = $if->html();
+                $replace = '<?php if(' . $condition . '){ ?>';
+                $replace .= $inner_html;
+                $replace .= '<?php }?>';
+                $if->replaceWith($replace);
+            }
+            // 转换elseif标签
+            foreach ($elseifs as $elseif) {
+                $elseif = pq($elseif);
+                if (!$condition = $elseif->attr('condition')) {
+                    throw new \Error('View dose not have attribute "condition"',
+                        E_USER_ERROR);
+                }
+                $condition = $this->convertEquJudge($condition);
+                $replace = '<?php }elseif(' . $condition . '){ ?>';
+                $elseif->replaceWith($replace);
+            }
+            // 转换else标签
+            foreach ($elses as $else) {
+                $else = pq($else);
+                $replace = '<?php }else{ ?>';
+                $else->replaceWith($replace);
+            }
+            // 装换for标签
+            foreach ($fors as $for) {
+                $for = pq($for);
+                if (!$data = $for->attr('data')) {
+                    throw new \Error('View dose not have attribute "data"',
+                        E_USER_ERROR);
+                }
+
+                $key = $for->attr('key') ?? 'key';
+                $value = $for->attr('value') ?? 'value';
+
+                $inner_html = $for->html();
+                $replace = '<?php foreach($this->assign_values["' . $data . '"] as $' . $key .
+                    ' => $' . $value . '){ ?>';
+                $inner_html = str_replace($left_delimiter . $key . $right_delimiter,
+                    '<?php echo $' . $key . ';?>', $inner_html);
+                $inner_html = str_replace($left_delimiter . $value . $right_delimiter,
+                    '<?php echo $' . $value . ';?>', $inner_html);
+                $replace .= $inner_html;
+                $replace .= '<?php } ?>';
+                $for->replaceWith($replace);
+            }
+            $content = html_entity_decode($doc->htmlOuter());
+        }
+
         $content = str_replace($left_delimiter,
             '<?php echo $this->assign_values["', $content);
         $content = str_replace($right_delimiter, '"]; ?>', $content);
@@ -96,9 +164,26 @@ class Controller
     }
 
     /**
-     * 生成静态HTML缓存文件
+     * 模板中判断条件 lt mt eq le me 的转换
+     * @param $condition string 条件
+     * @return mixed    转换后的条件
+     */
+    private function convertEquJudge($condition)
+    {
+        $condition = str_replace('lt', '<', $condition);
+        $condition = str_replace('mt', '>', $condition);
+        $condition = str_replace('eq', '==', $condition);
+        $condition = str_replace('le', '<=', $condition);
+        $condition = str_replace('me', '>=', $condition);
+        $condition = str_replace(Config::getValue('left_delimiter'), '$', $condition);
+        $condition = str_replace(Config::getValue('right_delimiter'), '', $condition);
+        return $condition;
+    }
+
+    /**
+     * 生成静态缓存文件
      * @method generateHtmlCache
-     * @return boolean            生成的结果
+     * @return string            生成的文件路径
      */
     private function generateCacheFile($file, $content)
     {
@@ -106,6 +191,7 @@ class Controller
         $cache_file_name = md5($file . '_' . $modify_time) . '.php';
         $cache_path = APP_CACHE_PATH . $cache_file_name;
         if (!file_exists($cache_path)) {
+            $content = $this->convertView($content);
             file_put_contents($cache_path, $content);
         }
         return $cache_path;

@@ -37,6 +37,7 @@ class Error
         // TODO
         // 使用错误模板
 
+        ob_end_clean();
         if (DEBUG_MODE) {
             echo '<h2>', $err_msg, '</h2>';
             echo '<h3>File: <span style="color:red;">', $err_file, '</span></h3>';
@@ -44,6 +45,7 @@ class Error
         } else {
             echo '<h2>页面发生错误，请稍后再试~</h2>';
         }
+        exit();
     }
 
     /**
@@ -57,6 +59,7 @@ class Error
             // TODO
             // 使用错误模板
             
+            ob_end_clean();
             if (DEBUG_MODE) {
                 echo '<h2>', $error['message'], '</h2>';
                 echo '<h3>File: <span style="color:red;">', $error['file'], '</span></h3>';
@@ -64,6 +67,7 @@ class Error
             } else {
                 echo '<h1>页面发生错误，请稍后再试</h1>';
             }
+            exit();
         }
     }
 }

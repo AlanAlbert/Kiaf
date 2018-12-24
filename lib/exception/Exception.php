@@ -31,6 +31,8 @@ class Exception
     {
         // TODO
         // 使用错误模板
+        
+        ob_end_clean();
         if (DEBUG_MODE) {
             echo '<h2>', $e->getMessage(), '</h2>';
             echo '<h3>File: <span style="color:red;">', $e->getFile(), '</span></h3>';
@@ -39,5 +41,6 @@ class Exception
         } else {
             echo '<h1>页面发生错误，请稍后再试~</h1>';
         }
+        exit();
     }
 }

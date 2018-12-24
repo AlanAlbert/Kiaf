@@ -30,6 +30,9 @@ class Kiaf
         $use_composer_autoload = false,
         $debug_mode = false)
     {
+        # 打开输出缓冲区
+        ob_start();
+
         # 调试模式
         define('DEBUG_MODE', $debug_mode);
 
@@ -63,6 +66,9 @@ class Kiaf
 
         # 路由
         Router::parseRequest();
+
+        # 输出缓冲区内容
+        ob_end_flush();
     }
 
     /**
