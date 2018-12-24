@@ -26,9 +26,9 @@ class Kiaf
      * @param  boolean $debug_mode            是否开启调试模式
      * @return void
      */
-    public static function run($app_path = './Application',
-        $use_composer_autoload = false,
-        $debug_mode = false)
+    public static function run(string $app_path = './Application',
+        bool $use_composer_autoload = false,
+        bool $debug_mode = false) : void
     {
         # 打开输出缓冲区
         ob_start();
@@ -76,7 +76,7 @@ class Kiaf
      * @method initConst
      * @return void
      */
-    private static function initConst()
+    private static function initConst() : void
     {
         # 框架相关信息
         define('FRAMEWORK', 'Kiaf');
@@ -114,7 +114,7 @@ class Kiaf
      * @method initFolder
      * @return void
      */
-    private static function initFolder()
+    private static function initFolder() : void
     {
         if (!is_dir(self::$app_path)) {
             mkdir(self::$app_path, 0777, true);
@@ -213,8 +213,6 @@ HTML;
             $initialized_flag_file => '',
         );
         self::createFiles($files);
-
-
     }
 
     /**
@@ -223,7 +221,7 @@ HTML;
      * @param  array        $dir_paths 文件夹路径数组
      * @return void
      */
-    private static function createFolders($dir_paths)
+    private static function createFolders(array $dir_paths) : void
     {
         foreach ($dir_paths as $value) {
             if (!is_dir($value)) {
@@ -238,7 +236,7 @@ HTML;
      * @param  array     $files [文件路径 => 文件内容]
      * @return void
      */
-    private static function createFiles($files)
+    private static function createFiles(array $files) : void
     {
         foreach ($files as $key => $value) {
             if (!file_exists($key)) {

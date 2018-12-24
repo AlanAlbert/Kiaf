@@ -40,7 +40,7 @@ class Model
      * @method getFields
      * @return array    ['fields' => [], 'primary' => []]
      */
-    private function getFields()
+    private function getFields() : array
     {
         $result = [];
         $sql = 'desc ' . $this->table;
@@ -60,7 +60,8 @@ class Model
      * @param  string     $str 大驼峰式名
      * @return string          下划线连接式名
      */
-    private function humpToLine($str){
+    private function humpToLine(string $str) : string
+    {
         $str = preg_replace_callback('/([A-Z]{1})/',function($matches){
             return '_'.strtolower($matches[0]);
         },$str);

@@ -16,7 +16,7 @@ class Error
      * @method registerErrorHandler
      * @return void
      */
-    public static function registerErrorHandler()
+    public static function registerErrorHandler() : void
     {
         error_reporting(0);
         set_error_handler(array(__CLASS__, 'errorHandler'));
@@ -32,7 +32,8 @@ class Error
      * @param  int       $err_line 错误行号
      * @return void
      */
-    public static function errorHandler($err_type, $err_msg, $err_file, $err_line)
+    public static function errorHandler(int $err_type, string $err_msg,
+        string $err_file, int $err_line) : void
     {
         // TODO
         // 使用错误模板
@@ -53,7 +54,7 @@ class Error
      * @method shutdownHandler
      * @return void
      */
-    public static function shutdownHandler()
+    public static function shutdownHandler() : void
     {
         if ($error = error_get_last()) {
             // TODO

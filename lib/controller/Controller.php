@@ -19,11 +19,11 @@ class Controller
      * 跳转函数
      * @method jump
      * @param  string  $url     跳转的URL
-     * @param  integer $timeout 延时
+     * @param  int $timeout 延时
      * @param  string  $msg     提示信息
      * @return void
      */
-    protected function jump($url, $timeout = 2, $msg = '跳转中，请稍后...')
+    protected function jump(string $url, int $timeout = 2, string $msg = '跳转中，请稍后...') : void
     {
         $tpl_file = APP_TPL_PATH . Config::getValue('jump_tpl');
         if (!file_exists($tpl_file)) {
@@ -50,11 +50,11 @@ class Controller
     /**
      * 指定需要渲染的值
      * @method assign
-     * @param  mixed $key   键
-     * @param  mixed $value 值
+     * @param  string $key   键
+     * @param  string $value 值
      * @return void
      */
-    protected function assign($key, $value)
+    protected function assign(string $key, string $value) : void
     {
         $this->assign_values[$key] = $value;
     }
@@ -64,7 +64,7 @@ class Controller
      * @method render
      * @return void
      */
-    protected function render()
+    protected function render() : void
     {
         $view_path = APP_PATH . CURRENT_MODULE . DS .
             'view' . DS .
@@ -84,7 +84,7 @@ class Controller
      * @param  string    $content 转换
      * @return string             转换完的内容
      */
-    private function convertView($content)
+    private function convertView(string $content) : string
     {
         require_once LIBRARY_PATH . 'phpquery/phpQuery.php';
         libxml_use_internal_errors(true);
@@ -165,10 +165,10 @@ class Controller
 
     /**
      * 模板中判断条件 lt mt eq le me 的转换
-     * @param $condition string 条件
-     * @return mixed    转换后的条件
+     * @param string $condition 条件
+     * @return string    转换后的条件
      */
-    private function convertEquJudge($condition)
+    private function convertEquJudge(string $condition) : string
     {
         $condition = str_replace('lt', '<', $condition);
         $condition = str_replace('mt', '>', $condition);
@@ -183,9 +183,11 @@ class Controller
     /**
      * 生成静态缓存文件
      * @method generateHtmlCache
-     * @return string            生成的文件路径
+     * @param    string   $file    文件路径
+     * @param string   $content 内容
+     * @return  string            生成的文件路径
      */
-    private function generateCacheFile($file, $content)
+    private function generateCacheFile(string $file, string $content) : string
     {
         $modify_time = filemtime($file);
         $cache_file_name = md5($file . '_' . $modify_time) . '.php';
@@ -200,15 +202,16 @@ class Controller
     /**
      * 根据模块、控制器、方法生成URL
      * @method generateUrl
+     * @param  array       $params     URL的参数
      * @param  string      $action     方法名
      * @param  string      $controller 控制器名
      * @param  string      $module     模块名
      * @return string                  URL
      */
-    protected function generateUrl($params,
-        $action = CURRENT_ACTION,
-        $controller = CURRENT_CONTROLLER,
-        $module = CURRENT_MODULE)
+    protected function generateUrl(array $params,
+        string $action = CURRENT_ACTION,
+        string $controller = CURRENT_CONTROLLER,
+        string $module = CURRENT_MODULE) : string
     {
         $url = ROOT_URL . "?m={$module}&c={$controller}&a={$action}";
         foreach ($params as $key => $value) {

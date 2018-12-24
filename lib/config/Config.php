@@ -53,7 +53,7 @@ class Config
      * @method parseConfig
      * @return void
      */
-    public static function loadConfig()
+    public static function loadConfig() : void
     {
         $config = include APP_CONFIG_PATH . 'config.php' ?? [];
         self::$config = array_merge(self::$config, $config);
@@ -83,7 +83,7 @@ class Config
      * @param  string   $key 配置的键key
      * @return mixed        配置的值value
      */
-    public static function getValue($key)
+    public static function getValue(string $key)
     {
         return self::$config[$key];
     }

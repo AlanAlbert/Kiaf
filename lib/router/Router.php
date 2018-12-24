@@ -22,7 +22,7 @@ class Router
      * @method parseRequest
      * @return void
      */
-    public static function parseRequest()
+    public static function parseRequest() : void
     {
         $query_string = $_SERVER['QUERY_STRING'] ?? '';
         $query_string = self::$router_map[$query_string] ?? $query_string;
@@ -53,7 +53,7 @@ class Router
      * @param  string   $des 目标路由
      * @return void
      */
-    public static function dispatch(string $src, string $des)
+    public static function dispatch(string $src, string $des) : void
     {
         self::$router_map[$src] = $des;
     }

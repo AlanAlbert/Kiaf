@@ -38,7 +38,7 @@ class Db
      * @param  string     $charset 字符集
      * @return int    受影响行数
      */
-    protected function setCharset($charset)
+    protected function setCharset(string $charset) : int
     {
         $sql = 'set names `' . $charset . '`';
         return $this->execSql($sql);
@@ -51,7 +51,7 @@ class Db
      * @param  array  $data 插入的数据
      * @return mixed       受影响的行数或false
      */
-    public function insert($tbl, $data = [])
+    public function insert(string $tbl, array $data = [])
     {
         if (empty($data)) {
             return false;
@@ -81,16 +81,18 @@ class Db
      * @method select
      * @param  string  $tbl    表名
      * @param  array   $fields 列
-     * @param  array   $where  where条件
+     * @param  string   $where  where条件
      * @param  integer $limit  limit
+     * @param  integer $offset offset
+     * @param  integer $type   返回值类型：关联数组 | 索引数组
      * @return mixed          结果数组或false
      */
-    public function select($tbl,
-        $fields = [],
-        $where = '',
-        $limit = 0,
-        $offset = 0,
-        $type = \PDO::FETCH_ASSOC)
+    public function select(string $tbl,
+        array $fields = [],
+        string $where = '',
+        int $limit = 0,
+        int $offset = 0,
+        int $type = \PDO::FETCH_ASSOC)
     {
         $data = [];
         $sql = 'select ';
@@ -123,9 +125,9 @@ class Db
      * @param  string  $tbl   表名
      * @param  string  $where where条件
      * @param  integer $limit limit
-     * @return mixed         删除的函数或false
+     * @return mixed         删除的行数或false
      */
-    public function delete($tbl, $where = '', $limit = 0)
+    public function delete(string $tbl, string $where = '', int $limit = 0)
     {
         $sql = 'delete from `' . $tbl . '` ';
         if ($where !== '') {
@@ -151,7 +153,7 @@ class Db
      * @param  integer $limit limit
      * @return mixed         受影响行数或false
      */
-    public function update($tbl, $data = [], $where = '', $limit = 0)
+    public function update(string $tbl, array $data = [], string $where = '', int $limit = 0)
     {
         if (empty($data)) {
             return false;
@@ -181,7 +183,7 @@ class Db
      * @method getLastError
      * @return array       错误信息
      */
-    public function getLastError()
+    public function getLastError() : array
     {
         return array(
             'errorCode' => $this->conn->errorCode(),
@@ -193,6 +195,7 @@ class Db
      * 直接执行SQL查询语句
      * @method execSql
      * @param  string  $sql SQL语句
+     * @param  integer $type 返回值类型： 索引数组 | 关联数组
      * @return array       结果
      */
     public function querySql($sql, $type = \PDO::FETCH_ASSOC)
@@ -210,7 +213,7 @@ class Db
      * @param  string  $sql SQL语句
      * @return int       受影响行数
      */
-    public function execSql($sql)
+    public function execSql(string $sql) : int
     {
         return $this->conn->exec($sql);
     }
@@ -221,7 +224,7 @@ class Db
      * @param  array         $fields 列
      * @return string                 部分SQL
      */
-    protected function generateFields($fields)
+    protected function generateFields(array $fields) : string
     {
         $sql = '';
         $tmp = [];
@@ -236,8 +239,9 @@ class Db
      * 设置数据库配置
      * @method setConfig
      * @param  array    $config 设置数据库配置
+     * @return void
      */
-    public static function setConfig($config)
+    public static function setConfig(array $config) : void
     {
         self::$config = $config;
     }

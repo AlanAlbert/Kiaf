@@ -16,7 +16,7 @@ class Exception
      * @method registerExceptionHandler
      * @return void
      */
-    public static function registerExceptionHandler()
+    public static function registerExceptionHandler() : void
     {
         set_exception_handler(array(__CLASS__, 'exceptionHandler'));
     }
@@ -27,7 +27,7 @@ class Exception
      * @param  \Throwable           $e 异常或错误
      * @return void
      */
-    public static function exceptionHandler(\Throwable $e)
+    public static function exceptionHandler(\Throwable $e) :void
     {
         // TODO
         // 使用错误模板

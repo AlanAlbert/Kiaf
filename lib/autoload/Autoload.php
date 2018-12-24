@@ -9,15 +9,18 @@
  */
 namespace kiaf\autoload;
 
-use kiaf\config\Config;
-
 class Autoload
 {
     private static $namespace_map = array(
         'kiaf\\' => LIBRARY_PATH,
     );
 
-    private static function autoload($class_name)
+    /**
+     * 自动加载回调函数
+     * @param string $class_name 类名
+     * @return void
+     */
+    private static function autoload(string $class_name) : void
     {
         $class_info = self::parseClassName($class_name);
         $dir = '';
@@ -34,8 +37,14 @@ class Autoload
         require $class_path;
     }
 
-    private static function parseClassName(string $class_name)
+    /**
+     * 解析类名
+     * @param string $class_name 类名
+     * @return array 分解后的结果
+     */
+    private static function parseClassName(string $class_name) : array
     {
+        $result = [];
         $body = explode('\\', $class_name);
         $result['class'] = array_pop($body);
         $result['namespace'] = implode('\\', $body);
@@ -43,12 +52,22 @@ class Autoload
         return $result;
     }
 
-    public static function registerAutoload()
+    /**
+     * 注册自动加载处理方法
+     * @return void
+     */
+    public static function registerAutoload() : void
 	{
         spl_autoload_register(array(__CLASS__, 'autoload'), true, true);
     }
 
-    public static function setNamespaceMap(string $namespace, string $dir)
+    /**
+     * 设置命名空间-目录映射
+     * @param string $namespace 命名空间
+     * @param string $dir 目录
+     * @return bool 设置成功与否
+     */
+    public static function setNamespaceMap(string $namespace, string $dir) : bool
     {
         if (isset(self::$namespace_map[$namespace])) {
             return false;
@@ -57,6 +76,11 @@ class Autoload
         return true;
     }
 
+    /**
+     *
+     * @param string $namespace
+     * @return mixed|null
+     */
     public static function getNamespaceMap(string $namespace)
     {
         return self::$namespace_map[$namespace] ?? null;
