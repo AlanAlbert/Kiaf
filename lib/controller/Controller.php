@@ -68,7 +68,7 @@ class Controller
     {
         $view_path = APP_PATH . CURRENT_MODULE . DS .
             'view' . DS .
-            CURRENT_CONTROLLER . DS .
+            strtolower(CURRENT_CONTROLLER) . DS .
             CURRENT_ACTION . '.php';
         if (!file_exists($view_path)) {
             throw new \Error('View file does not exist!' . $view_path, E_USER_ERROR);
@@ -183,8 +183,8 @@ class Controller
         $condition = str_replace('eq', '==', $condition);
         $condition = str_replace('le', '<=', $condition);
         $condition = str_replace('me', '>=', $condition);
-        $condition = str_replace(Config::getValue('left_delimiter'), '$', $condition);
-        $condition = str_replace(Config::getValue('right_delimiter'), '', $condition);
+        $condition = str_replace(Config::getValue('left_delimiter'), '$this->assign_values["', $condition);
+        $condition = str_replace(Config::getValue('right_delimiter'), '"]', $condition);
         return $condition;
     }
 

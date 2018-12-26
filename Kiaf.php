@@ -57,7 +57,7 @@ class Kiaf
         # 自动加载
         define('USE_COMPOSER_AUTOLOAD', $use_composer_autoload);
         if (!$use_composer_autoload) {
-            require AUTOLOAD_PATH . 'autoload.php';
+            require AUTOLOAD_PATH . 'Autoload.php';
             \kiaf\autoload\Autoload::registerAutoload();
         }
 

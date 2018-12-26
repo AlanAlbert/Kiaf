@@ -25,7 +25,7 @@ class Config
 
         # 默认模块、控制器、方法
         'default_module' => 'home',
-        'default_controller' => 'index',
+        'default_controller' => 'Index',
         'default_action' => 'index',
 
         # 视图左右定界符
