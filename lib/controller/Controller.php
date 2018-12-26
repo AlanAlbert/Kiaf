@@ -51,10 +51,10 @@ class Controller
      * 指定需要渲染的值
      * @method assign
      * @param  string $key   键
-     * @param  string $value 值
+     * @param  mixed $value 值
      * @return void
      */
-    protected function assign(string $key, string $value) : void
+    protected function assign(string $key, $value) : void
     {
         $this->assign_values[$key] = $value;
     }
@@ -109,7 +109,7 @@ class Controller
                         E_USER_ERROR);
                 }
                 $condition = $this->convertEquJudge($condition);
-                $inner_html = $if->html();
+                $inner_html = urldecode($if->html());
                 $replace = '<?php if(' . $condition . '){ ?>';
                 $replace .= $inner_html;
                 $replace .= '<?php }?>';
@@ -143,23 +143,31 @@ class Controller
                 $key = $for->attr('key') ?? 'key';
                 $value = $for->attr('value') ?? 'value';
 
-                $inner_html = $for->html();
+                $inner_html = urldecode($for->html());
                 $replace = '<?php foreach($this->assign_values["' . $data . '"] as $' . $key .
                     ' => $' . $value . '){ ?>';
-                $inner_html = str_replace($left_delimiter . $key . $right_delimiter,
-                    '<?php echo $' . $key . ';?>', $inner_html);
-                $inner_html = str_replace($left_delimiter . $value . $right_delimiter,
-                    '<?php echo $' . $value . ';?>', $inner_html);
+                $pattern_key = '/' . addcslashes($left_delimiter . $key . $right_delimiter, '{[]}') . '((\[.*?\])*)/is';
+                $pattern_value = '/' . addcslashes($left_delimiter . $value . $right_delimiter, '{[]}') . '((\[.*?\])*)/is';
+                $inner_html = preg_replace_callback_array([
+                    $pattern_key => function ($matches) use ($key) {
+                        return '<?php echo $' . $key . $matches[1] . ';?>';
+                    },
+                    $pattern_value => function ($matches) use ($value) {
+                        return '<?php echo $' . $value . $matches[1] . ';?>';
+                    }
+                ], $inner_html);
                 $replace .= $inner_html;
                 $replace .= '<?php } ?>';
                 $for->replaceWith($replace);
             }
-            $content = html_entity_decode($doc->htmlOuter());
+            $content = urldecode(html_entity_decode($doc->htmlOuter()));
         }
-
-        $content = str_replace($left_delimiter,
-            '<?php echo $this->assign_values["', $content);
-        $content = str_replace($right_delimiter, '"]; ?>', $content);
+        $pattern = '/' . addcslashes($left_delimiter, '{[]}') .
+            '(.*?)' .addcslashes($right_delimiter, '{[]}') .
+            '((\[.*?\])*)/is';
+        $content = preg_replace_callback($pattern, function ($matches) {
+            return '<?php echo $this->assign_values["' . $matches[1] . $matches[2] .'"]; ?>';
+        }, $content);
         return $content;
     }
 

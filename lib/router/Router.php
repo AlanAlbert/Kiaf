@@ -27,9 +27,9 @@ class Router
         $query_string = $_SERVER['QUERY_STRING'] ?? '';
         $query_string = self::$router_map[$query_string] ?? $query_string;
         parse_str($query_string, $params);
-        define('CURRENT_MODULE', strtolower($params['m'] ?? Config::getValue('default_module')));
-        define('CURRENT_CONTROLLER', strtolower($params['c'] ?? Config::getValue('default_controller')));
-        define('CURRENT_ACTION', strtolower($params['a'] ?? Config::getValue('default_action')));
+        define('CURRENT_MODULE', $params['m'] ?? Config::getValue('default_module'));
+        define('CURRENT_CONTROLLER', $params['c'] ?? Config::getValue('default_controller'));
+        define('CURRENT_ACTION', $params['a'] ?? Config::getValue('default_action'));
         unset($params['m']);
         unset($params['c']);
         unset($params['a']);
@@ -39,10 +39,10 @@ class Router
         // 加载不同平台的控制器
         $controller_path = '\\' . Config::getValue('app_root_namespace') . CURRENT_MODULE .
             '\\controller' .
-            '\\' . ucfirst(CURRENT_CONTROLLER);
+            '\\' . CURRENT_CONTROLLER;
         $controller = new $controller_path();
         $action = CURRENT_ACTION;
-        $controller->$action($params, $post_data);
+        $controller->$action($post_data, $params);
     }
 
     /**

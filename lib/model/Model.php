@@ -13,10 +13,15 @@ use kiaf\database\Db;
 
 class Model
 {
-    private $db;
-    private $table;
-    private $fields = array();
-    private $primary;
+    private $db;        // Db类
+    private $table;     // 当前表名
+    private $tbl_fields = array();  // 表的所有列
+    private $tbl_primary;           // 表的主键
+    private $where = '';            // where条件
+    private $limit = 0;             // limit条件
+    private $offset = 0;            // offset条件
+    private $type = \PDO::FETCH_ASSOC;  // 返回的数据类型
+    private $fields = [];               // 查询的列
 
     public function __construct()
     {
@@ -30,10 +35,167 @@ class Model
 
         # 获取当前表所有列
         $fields = $this->getFields();
-        $this->fields = $fields['fields'];
-        $this->primary = $fields['primary'];
+        $this->tbl_fields = $fields['fields'];
+        $this->tbl_primary = $fields['primary'];
     }
 
+    /**
+     * 获取当前表的记录数
+     * @return mixed
+     */
+    public function count()
+    {
+        return $this->db->count($this->table)[0]['count'];
+    }
+
+    /**
+     * where条件
+     * @param string $where where条件
+     * @param array $params 参数
+     * @return $this
+     */
+    public function where(string $where, array $params = []) : Model
+    {
+        if (empty($params)) {
+            $this->where = $where;
+        } else {
+            foreach ($params as $key => $param) {
+                $params[$key] = addslashes($param);
+            }
+            array_unshift($params, $where);
+            $this->where = call_user_func_array('sprintf', $params);
+        }
+        return $this;
+    }
+
+    /**
+     * limit条件
+     * @param int $limit
+     * @return $this
+     */
+    public function limit(int $limit) : Model
+    {
+        $this->limit = $limit;
+        return $this;
+    }
+
+    /**
+     * offset条件
+     * @param int $offset
+     * @return $this
+     */
+    public function offset(int $offset) : Model
+    {
+        $this->offset = $offset;
+        return $this;
+    }
+
+    /**
+     * 返回数据的类型 \PDO::FETCH_ASSOC ...
+     * @param int $type
+     * @return $this
+     */
+    public function type(int $type) : Model
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * 查询数据的列
+     * @param array $fields
+     * @return $this
+     */
+    public function field(array $fields)
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+    /**
+     * 查询
+     * @return array|bool 结果或false
+     */
+    public function select()
+    {
+        $result = $this->db->select($this->table,
+            $this->fields,
+            $this->where,
+            $this->limit,
+            $this->offset,
+            $this->type);
+        $this->resetValue();
+        return $result;
+    }
+
+    /**
+     *
+     * @param array $data 待插入的数据
+     * @return int|bool 插入的行数或false
+     */
+    public function insert(array $data)
+    {
+        return $this->db->insert($this->table, $data);
+    }
+
+    /**
+     * 删除
+     * @return mixed
+     */
+    public function delete()
+    {
+        $result = $this->db->delete($this->table,
+            $this->where,
+            $this->limit);
+        $this->resetValue();
+        return $result;
+    }
+
+    /**
+     * 更新
+     * @param int $data 更新的数据
+     * @return mixed
+     */
+    public function update(array $data)
+    {
+        $result = $this->db->update($this->table,
+            $data,
+            $this->where,
+            $this->limit);
+        $this->resetValue();
+        return $result;
+    }
+
+    /**
+     * 获取当前表的列
+     * @return array|mixed
+     */
+    public function getField()
+    {
+        return $this->tbl_fields;
+    }
+
+    /**
+     * 获取主键
+     * @return mixed
+     */
+    public function getPrimary()
+    {
+        return $this->tbl_primary;
+    }
+
+    /**
+     * 重置limit、where等值
+     * @return $this
+     */
+    private function resetValue()
+    {
+        $this->limit = $this->offset = 0;
+        $this->where = '';
+        $this->fields = [];
+        $this->type = \PDO::FETCH_ASSOC;
+        return $this;
+    }
 
     /**
      * 获取列

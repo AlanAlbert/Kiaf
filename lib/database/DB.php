@@ -11,9 +11,8 @@ namespace kiaf\database;
 
 class Db
 {
-    protected static $config = array();
+    protected static $config = array(); // 配置
     protected $conn = false;
-    protected $sql;
 
     public function __construct()
     {
@@ -48,7 +47,7 @@ class Db
      * 插入
      * @method insert
      * @param  string $tbl  表名
-     * @param  array  $data 插入的数据
+     * @param  array  $data 插入的数据，二维数组
      * @return mixed       受影响的行数或false
      */
     public function insert(string $tbl, array $data = [])
@@ -78,14 +77,13 @@ class Db
 
     /**
      * 查询
-     * @method select
-     * @param  string  $tbl    表名
-     * @param  array   $fields 列
-     * @param  string   $where  where条件
-     * @param  integer $limit  limit
-     * @param  integer $offset offset
-     * @param  integer $type   返回值类型：关联数组 | 索引数组
-     * @return mixed          结果数组或false
+     * @param string $tbl 表名
+     * @param array $fields 列
+     * @param string $where where条件
+     * @param int $limit limit
+     * @param int $offset offset
+     * @param int $type 返回值类型：关联数组 | 索引数组
+     * @return array|bool 结果数组或false
      */
     public function select(string $tbl,
         array $fields = [],
@@ -176,6 +174,12 @@ class Db
             return $stmt->rowCount();
         }
         return false;
+    }
+
+    public function count(string $tbl)
+    {
+        $sql = 'select count(*) as `count` from `' . $tbl . '`';
+        return $this->querySql($sql);
     }
 
     /**
