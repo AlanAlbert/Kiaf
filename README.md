@@ -1,5 +1,9 @@
 # Kiaf---Kiaf Is Another Framework
 
+## 声明
+
+本项目使用到[phpQuery](https://github.com/punkave/phpQuery)，感谢！
+
 ## 要求--Requirement
 
 本项目使用到：
@@ -28,13 +32,13 @@
 namespace kiaf;
 
 require('./vendor/autoload.php');
-Kiaf::run('./app', true);
+Kiaf::run('./app', true, true);
 
 # 2、也可以选择使用框架自带的autoload
 namespace kiaf;
 
 require('./kiaf/Kiaf.php');
-Kiaf::run('./app');
+Kiaf::run('./app', false, true);
 ```
 
 其中，run()函数是框架的运行入口，其接受两个参数：
@@ -44,9 +48,10 @@ Kiaf::run('./app');
  * 框架运行
  * @param string app_path 应用根目录
  * @param boolean use_composer_autoload 是否使用composer autoload
+ * @param boolean debug_mode 是否开启调试模式
  * @return void
  */
-Kiaf::run(string $app_path, boolean $use_composer_autoload)
+Kiaf::run(string $app_path, boolean $use_composer_autoload, boolean $debug_mode)
 ```
 
 **每次修改composer.json后都需要使用```composer update```来更新**
@@ -79,13 +84,37 @@ Kiaf::run(string $app_path, boolean $use_composer_autoload)
 'jump_tpl' => 'default_jump.tpl',
 
 # 数据库配置
-'db_type' => 'mysql',
-'db_host' => '127.0.0.1',
-'db_port' => '3306',
-'db_user' => 'root',
-'db_pwd' => '',
-'db_selected_db' => '',
-'db_char_set' => 'utf8',
+# 命名空间-路径 映射关系
+'namespace_map' => [
+
+],
+
+# 应用下根命名空间
+'app_root_namespace' => 'app\\',
+
+# 默认模块、控制器、方法
+'default_module' => 'home',
+'default_controller' => 'Index',
+'default_action' => 'index',
+
+# 视图左右定界符
+'left_delimiter' => '[{',
+'right_delimiter' => '}]',
+
+# 跳转模板
+'jump_tpl' => 'default_jump.tpl',
+// 'error_handler_tpl' => 'default_error_handler.tpl',
+
+# 数据库配置
+'database' => array(
+     // 'db_type' => '',
+     // 'db_host' => '',
+     // 'db_port' => '',
+     // 'db_user' => '',
+     // 'db_pwd' => '',
+     // 'db_name' => '',
+     // 'db_char_set' => '',
+),
 ```
 
 
