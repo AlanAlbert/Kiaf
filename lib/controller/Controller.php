@@ -68,7 +68,7 @@ class Controller
     {
         $view_path = APP_PATH . CURRENT_MODULE . DS .
             'view' . DS .
-            strtolower(CURRENT_CONTROLLER) . DS .
+            CURRENT_CONTROLLER . DS .
             CURRENT_ACTION . '.php';
         if (!file_exists($view_path)) {
             throw new \Error('View file does not exist!' . $view_path, E_USER_ERROR);
