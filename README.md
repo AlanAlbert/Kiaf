@@ -1,5 +1,9 @@
 # Kiaf---Kiaf Is Another Framework
 
+## 声明
+
+本项目使用到[phpQuery](https://github.com/punkave/phpQuery)，感谢！
+
 ## 要求--Requirement
 
 本项目使用到：
@@ -28,28 +32,27 @@
 namespace kiaf;
 
 require('./vendor/autoload.php');
-Kiaf::run('./app', true);
+Kiaf::run('./app', true, true);
 
 # 2、也可以选择使用框架自带的autoload
 namespace kiaf;
 
 require('./kiaf/Kiaf.php');
-Kiaf::run('./app');
+Kiaf::run('./app', false, true);
 ```
 
-其中，run()函数是框架的运行入口，其接受两个参数：
+其中，run()函数是框架的运行入口，其接受三个参数：
 
 ```PHP
 /**
  * 框架运行
  * @param string app_path 应用根目录
  * @param boolean use_composer_autoload 是否使用composer autoload
+ * @param boolean debug_mode 是否开启调试模式
  * @return void
  */
-Kiaf::run(string $app_path, boolean $use_composer_autoload)
+Kiaf::run(string $app_path, boolean $use_composer_autoload, boolean $debug_mode)
 ```
-
-**每次修改composer.json后都需要使用```composer update```来更新**
 
 ### 配置文件
 
@@ -79,15 +82,177 @@ Kiaf::run(string $app_path, boolean $use_composer_autoload)
 'jump_tpl' => 'default_jump.tpl',
 
 # 数据库配置
-'db_type' => 'mysql',
-'db_host' => '127.0.0.1',
-'db_port' => '3306',
-'db_user' => 'root',
-'db_pwd' => '',
-'db_selected_db' => '',
-'db_char_set' => 'utf8',
+# 命名空间-路径 映射关系
+'namespace_map' => [
+
+],
+
+# 应用下根命名空间
+'app_root_namespace' => 'app\\',
+
+# 默认模块、控制器、方法
+'default_module' => 'home',
+'default_controller' => 'Index',
+'default_action' => 'index',
+
+# 视图左右定界符
+'left_delimiter' => '[{',
+'right_delimiter' => '}]',
+
+# 跳转模板
+'jump_tpl' => 'default_jump.tpl',
+// 'error_handler_tpl' => 'default_error_handler.tpl',
+
+# 数据库配置
+'database' => array(
+     // 'db_type' => '',
+     // 'db_host' => '',
+     // 'db_port' => '',
+     // 'db_user' => '',
+     // 'db_pwd' => '',
+     // 'db_name' => '',
+     // 'db_char_set' => '',
+),
 ```
 
+### Controller
+
+```php
+namespace app\home\controller;
+
+use kiaf\controller\Controller;
+
+class Index extends Controller
+{
+    
+}
+```
+
+Controller提供的方法：
+
+```php
+// 跳转方法
+Controller::jump(
+    string $url, 
+    int $timeout = 2, 
+    string $msg = '跳转中，请稍后...'
+) : void
+
+// 指定需要在视图中使用的值
+Controller::assign(
+    string $key, 
+    mixed $value
+) : void
+
+// 渲染视图
+Controller::render() : void
+
+// 生成URL
+Controller::generateUrl(
+    array $params, 
+    string $action = CURRENT_ACTION,
+    string $controller = CURRENT_CONTROLLER, 
+    string $module = CURRENT_MODULE
+) : string
+```
+
+### Model
+
+```php
+namespace app\home\model;
+
+use kiaf\model\Model;
+
+class UserInfo extends Model
+{
+
+}
+// 其中，模型类名需要使用大驼峰命名；表名需要使用下划线连接方式；类名与表名需要严格对应（一个模型类对应一个表），例如:
+// 类名 UserInfo
+// 表名 user_info
+```
+
+Model提供的方法：
+
+```php
+// 获取表中的记录
+Model::count() : void
+
+// 获取当前表的所有列
+Model::getFiled() : void
+
+// 获取当前表的主键
+Model::getPrimary() : void
+
+// 设置where条件
+Model::where(
+    string $where, 
+    array $params = []
+) : $this
+// 例如
+$user_info->where('id > %d AND age < %d', [3, 20]);
+
+// 设置limit条件
+Model::limit(int $limit) : $this
+
+// 设置offset条件
+Model::offset(int $offset) : $this
+
+// 设置查询的返回类型
+Model::type(int $type) : $this
+// $type可取\PDO::FETCH_ASSOC、\PDO::FETCH_BOTH等
+
+// 设置查询的列
+Model::field(array $fileds) : $this
+
+// 查询
+Model::select() : array | false
+
+// 插入，$data必须为二维数组（$data = [['name' => 'Alan', 'age' => 18]]）
+Model::insert(array $data) : int | false
+
+// 删除
+Model::delete() : int | false
+
+// 更新
+Model::update() : int | false
+```
+
+### View
+
+```php
+// 视图路径app/MODULE_NAME/view/CONTROLLER_NAME/ACTION_NAME
+// 如：app/home/view/Index/index
+
+```
+
+在视图中，
+
+```php
+// 边界符默认为[{、}]，可以在配置文件设置
+// 使用在控制器中指定的变量
+<h1>[{value}]</h1>
+
+// 使用数组
+<h1>[{value}]['name']</h1>
+
+// if条件
+// mt 大于
+// me 大于等于
+// eq 等于
+// lt 小于
+// le 小于等于
+<if condition="[{value}] mt 25">
+    <elseif condition="[{value}] me 40" />
+    <else />
+</if>
+
+// for循环
+<for data="arr" key="k" value="v">
+    <div>[{value}]</div>
+</for>
+
+```
 
 ## 编码规范
 
