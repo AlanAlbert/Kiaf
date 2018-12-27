@@ -113,7 +113,6 @@ Kiaf::run(string $app_path, boolean $use_composer_autoload, boolean $debug_mode)
      // 'db_name' => '',
      // 'db_char_set' => '',
 ),
-<<<<<<< HEAD
 ```
 
 ### Controller
@@ -127,8 +126,6 @@ class Index extends Controller
 {
     
 }
-=======
->>>>>>> d783bd266d35abd7b0cc4723f4daf8635e508cd4
 ```
 
 Controller提供的方法：
