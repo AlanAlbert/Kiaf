@@ -1,8 +1,11 @@
 # Kiaf---Kiaf Is Another Framework
 
+**本框架是我学习中开发的框架，仍存在许多不足，切勿在正式项目中使用**
+
 ## 声明
 
 本项目使用到[phpQuery](https://github.com/punkave/phpQuery)，感谢！
+
 
 ## 要求--Requirement
 
